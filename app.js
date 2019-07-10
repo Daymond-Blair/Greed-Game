@@ -9,7 +9,7 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer, gamePlaying;
+var scores, roundScore, activePlayer, gamePlaying, victoryScore, previousRoll;
 
 startGame();
 
@@ -40,9 +40,19 @@ document.querySelector('.btn-roll').addEventListener('click', function () {
         diceDOM.style.display = 'block';
         // set the stored query selection to concatenated string value, between 6 dice pictures
         diceDOM.src = 'dice-' + dice + '.png';
-        // update the round score if the rolled number was not a 1
-        if (dice !== 1) {
+
+        // remove player score if 6 is rolled consecutively
+        if (dice === 6 && previousRoll === 6) {
+            // set player score back to zero
+            scores[activePlayer] = 0;
+            // update DOM
+            document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+            nextPlayer();
+        } else if (dice !== 1) {
+            // update the round score if the rolled number was not a 1
             roundScore += dice;
+            currentRoll = dice;
+
             // display updated round score
             document.querySelector('#current-' + activePlayer).textContent = roundScore;
         } else {
@@ -51,6 +61,7 @@ document.querySelector('.btn-roll').addEventListener('click', function () {
             nextPlayer();
 
         }
+        previousRoll = dice;
         //document.querySelector('.player-0-panel').classList.add('active');
     }
 });
@@ -63,9 +74,9 @@ document.querySelector('.btn-hold').addEventListener('click', function () {
 
         // update ui to show the current score
         document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
-
+        var winScore = document.querySelector('#winScore').value;
         // check if player won the game by reaching 100 or more
-        if (scores[activePlayer] >= 100) {
+        if (scores[activePlayer] >= winScore) {
             // add win notification to winner's side
             document.querySelector('#name-' + activePlayer).textContent = 'You Won!';
             // remove dice picture
@@ -110,6 +121,8 @@ function startGame() {
     roundScore = 0;
     activePlayer = 0;
 
+    //victoryScore = prompt("What are you playing to?");
+
     document.querySelector('.dice').style.display = 'none';
 
     document.getElementById('score-0').textContent = '0';
@@ -133,3 +146,9 @@ function endGame() {
     document.querySelector('#name-' + activePlayer).textContent = "You win!";
     //alert("Game over, player " + activePlayer + " wins!");
 }
+
+/*
+challenges
+1. player loses entire score when rolling two 6 in a row
+2. add input field which accepts winning score.
+3. add second dice to the game */
